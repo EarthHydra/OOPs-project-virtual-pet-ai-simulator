@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include <fstream>
 
 // Abstract class for events
 class Event {
@@ -66,6 +67,31 @@ public:
         std::cout << name << " performs a " << trick << " trick!\n";
     }
 
+    // Save pet state to a file
+    void saveState(const std::string& filename) {
+        std::ofstream outFile(filename);
+        if (outFile) {
+            outFile << name << "\n" << hunger << "\n" << happiness << "\n" << energy << "\n";
+            outFile.close();
+            std::cout << "Pet state saved to " << filename << ".\n";
+        } else {
+            std::cerr << "Error saving pet state.\n";
+        }
+    }
+
+    // Load pet state from a file
+    void loadState(const std::string& filename) {
+        std::ifstream inFile(filename);
+        if (inFile) {
+            std::getline(inFile, name);
+            inFile >> hunger >> happiness >> energy;
+            inFile.close();
+            std::cout << "Pet state loaded from " << filename << ".\n";
+        } else {
+            std::cerr << "Error loading pet state.\n";
+        }
+    }
+
     virtual ~Pet() {}
 };
 
@@ -116,6 +142,8 @@ enum Action {
     REST,
     PERFORM_TRICK,
     TRIGGER_EVENT,
+    SAVE_STATE,
+    LOAD_STATE,
     EXIT
 };
 
@@ -144,7 +172,7 @@ int main() {
     int choice;
     while (true) {
         std::cout << "\nChoose an action:\n";
-        std::cout << "1. Feed\n2. Play\n3. Rest\n4. Perform Trick\n5. Trigger Random Event\n6. Exit\n";
+        std::cout << "1. Feed\n2. Play\n3. Rest\n4. Perform Trick\n5. Trigger Random Event\n6. Save Pet State\n7. Load Pet State\n8. Exit\n";
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
@@ -163,6 +191,12 @@ int main() {
                 break;
             case TRIGGER_EVENT:
                 triggerRandomEvent(myPet->getName());
+                break;
+            case SAVE_STATE:
+                myPet->saveState("pet_state.txt");
+                break;
+            case LOAD_STATE:
+                myPet->loadState("pet_state.txt");
                 break;
             case EXIT:
                 std::cout << "Goodbye!\n";
